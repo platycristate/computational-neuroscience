@@ -108,6 +108,32 @@ def spike_count(spikes, step_interval=100):
         end += step_interval
     return np.array(spikes_counts)
 
+def autocorrelation(spikes, dt=1e-2):
+    '''
+    Computes autocorrelation histogram, by dividing
+    time into bins and calculating. For each bin we calculate the no. of
+    times 2 spikes are separated by some ISI (ms) (x-axis).
+    '''
+    duration = np.max(spikes)
+    NoBins = int( duration/dt)
+    print(NoBins)
+    CountIntervals = []
+    IBS = []
+    for i in range(len(spikes)):
+        # counting differences in time between current spike and all subsequent spikes
+        intervals = spikes - spikes[i]
+        IBS.extend(intervals)
+    IBS = np.array(IBS)
+    for m in range(-NoBins, NoBins+1):
+        lower = m*dt - (dt/2)
+        upper = m*dt + (dt/2)
+        InBin = np.count_nonzero( (IBS >= lower) & (IBS < upper) )
+        InBin = (InBin/duration) - ((len(spikes)*len(spikes) * dt) / (duration**2))
+        CountIntervals.append(InBin)
+
+    CountIntervals = np.array(CountIntervals)
+    BinsBoundaries = np.array([m*dt for m in range(-NoBins, NoBins+1)])
+    return BinsBoundaries, CountIntervals
 
 def fano(spikes):
     '''
