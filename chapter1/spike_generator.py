@@ -66,6 +66,16 @@ def rate_recovery(t, r0, tau_ref):
     tau_ref /= 1000 # converts to seconds
     return r0 * (1 - np.exp(-t/tau_ref) )
 
+def PlotTrials(process=HomogeneousPoissonEfficient, rate=40, duration=1, trials=20):
+    plt.figure(figsize=(8, 5), dpi=100)
+    NeuralResponses = []
+    for i in range(trials):
+        NeuralResponses.append( process(10, 1) )
+
+    plt.eventplot(NeuralResponses, linelengths=0.5)
+    plt.xlabel('time [ms]')
+    plt.ylabel('trial number')
+
 def distribution_spike_counts(spikes, step_interval=100, bindwidth=1, plot=False):
     spikes_counts = spike_count(spikes, step_interval)
     if plot:
@@ -97,6 +107,7 @@ def spike_count(spikes, step_interval=100):
         start += step_interval
         end += step_interval
     return np.array(spikes_counts)
+
 
 def fano(spikes):
     '''
