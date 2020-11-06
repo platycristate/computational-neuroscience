@@ -37,6 +37,27 @@ def HomogeneousPoissonEfficient(rate, duration):
 
     return np.array( spikes[1:-1] )
 
+def NonhomogeneousPoisson(rate_func, duration):
+    '''
+    Nonhomogeneous Poisson process spike generator
+    with time-dependent firing rate
+
+    Return: array with spike times
+    '''
+    r_max = np.max( rate_func( np.linspace(0, duration, duration*1000 ) ))
+    spikes = [0]
+    while spikes[-1] < duration:
+        spikes.append( spikes[-1] - np.log(np.random.rand()) / r_max )
+    ToBeRemoved = []
+    for spike_time in spikes:
+        if rate_func(spike_time)/r_max < np.random.rand():
+            ToBeRemoved.append(spike_time)
+    spikes_thinned = np.delete( np.array(spikes), ToBeRemoved )
+    return spikes_thinned
+
+def rate_func(t):
+    return 100*(1 + np.cos(2*np.pi*t/25))
+
 def HomogeneousPoissonRefractory(rate, duration, tau):
     '''
     Homogeneous Poisson spike generator,
@@ -108,15 +129,15 @@ def spike_count(spikes, step_interval=100):
         end += step_interval
     return np.array(spikes_counts)
 
-def autocorrelation(spikes, dt=1e-2):
+def autocorrelation(spikes, time_lag=100, dt=1e-2):
     '''
     Computes autocorrelation histogram, by dividing
     time into bins and calculating. For each bin we calculate the no. of
     times 2 spikes are separated by some ISI (ms) (x-axis).
     '''
     duration = np.max(spikes)
-    NoBins = int( duration/dt)
-    print(NoBins)
+    time_lag /= 1000 # convert to seconds
+    NoBins = int( time_lag/dt)
     CountIntervals = []
     IBS = []
     for i in range(len(spikes)):
@@ -132,7 +153,7 @@ def autocorrelation(spikes, dt=1e-2):
         CountIntervals.append(InBin)
 
     CountIntervals = np.array(CountIntervals)
-    BinsBoundaries = np.array([m*dt for m in range(-NoBins, NoBins+1)])
+    BinsBoundaries = np.array([m*dt for m in range(-NoBins, NoBins+1)]) * 1000
     return BinsBoundaries, CountIntervals
 
 def fano(spikes):
