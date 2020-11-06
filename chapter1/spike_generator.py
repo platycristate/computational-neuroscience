@@ -37,6 +37,9 @@ def HomogeneousPoissonEfficient(rate, duration):
 
     return np.array( spikes[1:-1] )
 
+def rate_func(t):
+    return 100*(1 + np.cos(2*np.pi*t/25))
+
 def NonhomogeneousPoisson(rate_func, duration):
     '''
     Nonhomogeneous Poisson process spike generator
@@ -52,11 +55,9 @@ def NonhomogeneousPoisson(rate_func, duration):
     for spike_time in spikes:
         if rate_func(spike_time)/r_max < np.random.rand():
             ToBeRemoved.append(spike_time)
-    spikes_thinned = np.delete( np.array(spikes), ToBeRemoved )
-    return spikes_thinned
-
-def rate_func(t):
-    return 100*(1 + np.cos(2*np.pi*t/25))
+    print(len(ToBeRemoved))
+    spikes_thinned = sorted(list(set(spikes) - set(ToBeRemoved)))
+    return np.array(spikes_thinned)
 
 def HomogeneousPoissonRefractory(rate, duration, tau):
     '''
