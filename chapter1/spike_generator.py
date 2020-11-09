@@ -55,26 +55,6 @@ def NonhomogeneousPoisson(rate_func, duration):
     spikes_thinned = np.delete( np.array(spikes), ToBeRemoved )
     return spikes_thinned
 
-#def NonhomogeneousPoissonRapprox(r_approx, duration, tau=10, dt=1e-3):
-#    '''
-#    Nonhomogeneous Poisson spike generator,
-#    after each spike firing rat is increased by 1/tau,
-#    and decays exponentially  exp(-t/tau)
-#
-#    Return: array with spike times
-#    '''
-#    NoBins = int(duration / dt)
-#    time = np.arange(0, 10, NoBins)
-#    r0 = 1000 / tau # convert tau to seconds
-#    spikes = [0]
-#    r_approx_vec = []
-#    for i in range(len(time)):
-#        r_a = r_approx(time[i] - spikes[-1], r0, tau_approx=tau)
-#        r_approx_vec.append(r_a)
-#        if  r_a * dt > np.random.rand():
-#            spikes.append(time[i])
-#            r0 += 1/tau
-#    return np.array(spikes), np.array(r_approx_vec)
 
 def HomogeneousPoissonRefractory(rate, duration, tau):
     '''
