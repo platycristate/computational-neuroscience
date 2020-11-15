@@ -55,6 +55,26 @@ def NonhomogeneousPoisson(rate_func, duration):
     spikes_thinned = np.delete( np.array(spikes), ToBeRemoved )
     return spikes_thinned
 
+def NonhomogeneousPoissonVector(rate_vec, time, duration):
+    '''
+    Nonhomogeneous Poisson process spike generator
+    with time-dependent firing rate
+
+    Return: array with spike times
+    '''
+    r_max = rate_vec.max()
+    spikes = [0]
+    while spikes[-1] < duration:
+        spikes.append( spikes[-1] - np.log(np.random.rand()) / r_max )
+    ToBeRemoved = []
+    for i  in range(1, len(spikes)):
+		# get the index in the rate_vec that is closest to the spike time
+        idx = np.argmax(time >= spikes[i])
+        if rate_vec[idx]/r_max < np.random.rand():
+            ToBeRemoved.append(i)
+    spikes_thinned = np.delete( np.array(spikes), ToBeRemoved )
+    return spikes_thinned, spikes
+
 
 def HomogeneousPoissonRefractory(rate, duration, tau):
     '''
@@ -137,7 +157,7 @@ def crosscorrelation(ts1, ts2, time, time_lag=100):
 	CorrespondingTimeIdx = np.argmax(time > time_lag)
 	Q = np.zeros(CorrespondingTimeIdx + 1)
 	for tau in range( len(Q) ):
-		Q[tau] = (1/M) * np.sum(ts1 * np.hstack([ ts2[tau:], ts2[: M - (M - tau)] ]))
+		Q[tau] =  1/(M-1) * np.sum(ts1 * np.hstack([ ts2[tau:], ts2[: M - (M - tau)] ]))
 		
 	return Q, time[:CorrespondingTimeIdx+1]
 		
