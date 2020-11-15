@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import random
-plt.style.use('seaborn-whitegrid')
 
 
 def HomogeneousPoisson(rate, duration, dt=1e-3):
@@ -69,7 +68,7 @@ def NonhomogeneousPoissonVector(rate_vec, time, duration):
     ToBeRemoved = []
     for i  in range(1, len(spikes)):
 		# get the index in the rate_vec that is closest to the spike time
-        idx = np.argmax(time >= spikes[i])
+        idx = np.argmax(time >= spikes[i]) - 1
         if rate_vec[idx]/r_max < np.random.rand():
             ToBeRemoved.append(i)
     spikes_thinned = np.delete( np.array(spikes), ToBeRemoved )
@@ -104,6 +103,22 @@ def rate_recovery(t, r0, tau_ref):
     '''
     tau_ref /= 1000 # converts to seconds
     return r0 * (1 - np.exp(-t/tau_ref) )
+
+def STA(stim, time, spikes, window=500):
+    '''Spike-triggered average, by summing stimulus in the range 
+    spike_time - 300 ms for all spikes and dividing by the number of sums
+    '''
+    window /= 1000 # converts to seconds
+    sum_stim = np.zeros(np.shape(stim[:np.argmax(time > window)]))
+    valid_spikes = spikes[np.argmax(spikes > window):np.argmax(spikes > time.max())]
+    for t in valid_spikes:
+        start = np.argmax(time > t-window) - 1
+        end = np.argmax(time > t)
+        sum_stim += stim[start:end]
+    avg_stim = sum_stim / len(valid_spikes)
+    time_stim = time[:np.argmax(time > window)]
+    return avg_stim, time_stim
+        
 
 def PlotTrials(process=HomogeneousPoissonEfficient, rate=40, duration=1, trials=20):
     plt.figure(figsize=(8, 5), dpi=100)
