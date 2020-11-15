@@ -175,6 +175,23 @@ def crosscorrelation(ts1, ts2, time, time_lag=100):
 		Q[tau] =  1/(M-1) * np.sum(ts1 * np.hstack([ ts2[tau:], ts2[: M - (M - tau)] ]))
 		
 	return Q, time[:CorrespondingTimeIdx+1]
+
+def crosscorrelation2(ts1, ts2, time, time_lag=100):
+	'''Calculates crosscorrelation function for 
+	two time series t1 and t2 in the range of time_lag
+	'''
+	time_lag /= 1000 # convert to seconds
+	# this is needed to conserve temporal resolution
+	CorrespondingTimeIdx = np.argmax(time > time_lag)
+	Q = np.zeros(CorrespondingTimeIdx + 1)
+	# averaging term: dt divided by the duration of the trial
+	Δt = time[1] - time[0]
+	for tau in range( len(Q) ):
+		shift = ts2[tau:]
+		M = len(shift)
+		initial = ts1[:M]
+		Q[tau] = (Δt/M) * np.sum(initial * shift) 
+	return Q, time[:CorrespondingTimeIdx+1]
 		
 
 def autocorrelation(spikes, time_lag=100, dt=1e-2):
