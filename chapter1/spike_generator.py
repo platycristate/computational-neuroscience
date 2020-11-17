@@ -104,20 +104,21 @@ def rate_recovery(t, r0, tau_ref):
     tau_ref /= 1000 # converts to seconds
     return r0 * (1 - np.exp(-t/tau_ref) )
 
-#def STA(stim, time, spikes, window=500):
-#    '''Spike-triggered average, by summing stimulus in the range 
-#    spike_time - 300 ms for all spikes and dividing by the number of sums
-#    '''
-#    window /= 1000 # converts to seconds
-#    sum_stim = np.zeros(np.shape(stim[:np.argmax(time > window)]))
-#    valid_spikes = spikes[np.argmax(spikes > window):np.argmax(spikes > time.max())]
-#    for t in valid_spikes:
-#        start = np.argmax(time > t-window) - 1
-#        end = np.argmax(time > t)
-#        sum_stim += stim[start:end]
-#    avg_stim = sum_stim / len(valid_spikes)
-#    time_stim = time[:np.argmax(time > window)]
-#    return avg_stim, time_stim
+def STA(stim, time, spikes, window=500):
+    '''Spike-triggered average, by summing stimulus in the range 
+    spike_time - 300 ms for all spikes and dividing by the number of sums
+    '''
+    window /= 1000 # converts to seconds
+    sum_stim = np.zeros(np.shape(stim[:np.argmax(time > window)]))
+    valid_spikes = spikes[np.argmax(spikes > window):np.argmax(spikes > time.max())]
+    for t in valid_spikes:
+        start = np.argmax(time > t-window) - 1
+        end = np.argmax(time > t)
+        sum_stim += stim[start:end]
+    avg_stim = sum_stim / len(valid_spikes)
+    time_stim = time[:np.argmax(time > window)]
+    return avg_stim, time_stim
+
 def STA_new(stim, time, spikes, window=500):
     '''
     This Spike-triggered averaging works with binary string of spikes [0,1] = [not a spikes, spike];
