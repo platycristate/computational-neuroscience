@@ -179,19 +179,6 @@ def spike_count(spikes, step_interval=100):
         end += step_interval
     return np.array(spikes_counts)
 
-def crosscorrelation(ts1, ts2, time, time_lag=100):
-	'''Calculates crosscorrelation function for 
-	two time series t1 and t2 in the range of time_lag
-	'''
-	M = len(ts2)
-	time_lag /= 1000 # convert to seconds
-	# this is needed to conserve temporal resolution
-	CorrespondingTimeIdx = np.argmax(time > time_lag)
-	Q = np.zeros(CorrespondingTimeIdx + 1)
-	for tau in range( len(Q) ):
-		Q[tau] =  1/(M-1) * np.sum(ts1 * np.hstack([ ts2[tau:], ts2[: M - (M - tau)] ]))
-		
-	return Q, time[:CorrespondingTimeIdx+1]
 
 def crosscorrelation2(ts1, ts2, time, time_lag=100):
 	'''Calculates crosscorrelation function for 
