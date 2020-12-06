@@ -194,7 +194,7 @@ def crosscorrelation2(ts1, ts2, time, time_lag=100):
 		shift = ts2[tau:]
 		M = len(shift)
 		initial = ts1[:M]
-		Q[tau] = (Δt/M) * np.sum(initial * shift) 
+		Q[tau] = (Δt/float(M)) * np.sum(initial * shift) 
 	return Q, time[:CorrespondingTimeIdx+1]
 		
 
