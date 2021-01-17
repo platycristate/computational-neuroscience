@@ -133,7 +133,7 @@ def STA_new(stim, time, spikes, window=500):
             if val == 1:
                 sum_stim += stim[i - time_steps: i]  
     avg_stim = sum_stim / len(spikes[spikes==1])
-    time_stim = time[:time_steps]
+    time_stim = time[:time_steps]*(-1)
     return avg_stim, time_stim
         
 
@@ -191,11 +191,12 @@ def crosscorrelation2(ts1, ts2, time, time_lag=100):
 	# averaging term: dt divided by the duration of the trial
 	Δt = time[1] - time[0]
 	for tau in range( len(Q) ):
-		shift = ts2[tau:]
-		M = len(shift)
-		initial = ts1[:M]
-		Q[tau] = (Δt/float(M)) * np.sum(initial * shift) 
-	return Q, time[:CorrespondingTimeIdx+1]
+		shift_backward = np.hstack((ts1[tau:], ts1[:tau]))
+		M = len(shift_backward)
+		initial = np.hstack((ts2[:M], ts1[M:]))
+		Q[tau] = (Δt/float(M)) * np.sum(initial * shift_backward) 
+		
+	return Q, time[:CorrespondingTimeIdx+1] * (-1)
 		
 
 def autocorrelation(spikes, time_lag=100, dt=1e-2):
