@@ -158,7 +158,6 @@ def distribution_spike_counts(spikes, step_interval=100, bindwidth=1, plot=False
         return spikes_counts
 
 def ISI_distribution(spikes):
-    plt.figure(dpi=100)
     isi = np.diff(spikes) * 1000
     plt.hist(isi, bins='auto', color='purple', ec='black')
     plt.xlabel('ISI [ms]', fontsize=16)
